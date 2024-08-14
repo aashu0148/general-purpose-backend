@@ -46,7 +46,9 @@ const createForm = async (req, res) => {
 };
 
 const getUserForms = async (req, res) => {
-  const forms = await FormSchema.find({ createdBy: req.user._id });
+  const forms = await FormSchema.find({ createdBy: req.user._id })
+    .select("-questions")
+    .lean();
 
   createResponse(res, forms, 200);
 };

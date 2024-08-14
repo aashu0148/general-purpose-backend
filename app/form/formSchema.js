@@ -16,13 +16,7 @@ const schema = new mongoose.Schema(
       required: true,
     },
     formImage: String,
-    questions: [
-      {
-        type: String,
-        title: String,
-        options: Array,
-      },
-    ],
+    questions: Array,
   },
   {
     timestamps: true,

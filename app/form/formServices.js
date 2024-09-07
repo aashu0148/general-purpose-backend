@@ -1,4 +1,5 @@
 import FormSchema from "./formSchema.js";
+import SubmissionSchema from "../submission/submissionSchema.js";
 
 import { createError, createResponse } from "#src/utils/utility.js";
 
@@ -46,11 +47,34 @@ const createForm = async (req, res) => {
 };
 
 const getUserForms = async (req, res) => {
-  const forms = await FormSchema.find({ createdBy: req.user._id })
-    .select("-questions")
-    .lean();
+  try {
+    const forms = await FormSchema.find({ createdBy: req.user._id })
+      .select("-questions") // Exclude the questions field
+      .lean(); // Convert documents to plain JS objects
 
-  createResponse(res, forms, 200);
+    // Fetch submission counts for each form
+    const formIds = forms.map((form) => form._id);
+
+    const submissionCounts = await SubmissionSchema.aggregate([
+      { $match: { form: { $in: formIds } } },
+      { $group: { _id: "$form", submissionCount: { $sum: 1 } } },
+    ]);
+
+    // Add submission count to each form
+    const formsWithSubmissionCount = forms.map((form) => {
+      const submissionData = submissionCounts.find(
+        (sub) => sub._id.toString() === form._id.toString()
+      );
+      return {
+        ...form,
+        submissionCount: submissionData ? submissionData.submissionCount : 0, // Default to 0 if no submissions
+      };
+    });
+
+    createResponse(res, formsWithSubmissionCount, 200);
+  } catch (error) {
+    createError(res, error?.message || "Failed to get forms", 500, error);
+  }
 };
 
 const getForm = async (req, res) => {

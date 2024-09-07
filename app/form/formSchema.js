@@ -1,5 +1,21 @@
 import mongoose from "mongoose";
 
+const questionSchema = new mongoose.Schema({
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId(),
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  options: [String], // Assuming the question might have options (e.g., for multiple-choice)
+});
+
 const schema = new mongoose.Schema(
   {
     name: {
@@ -16,7 +32,7 @@ const schema = new mongoose.Schema(
       required: true,
     },
     formImage: String,
-    questions: Array,
+    questions: [questionSchema],
   },
   {
     timestamps: true,

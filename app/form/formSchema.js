@@ -13,6 +13,7 @@ const questionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  inputType: String,
   options: [String], // Assuming the question might have options (e.g., for multiple-choice)
 });
 

@@ -48,9 +48,17 @@ const createForm = async (req, res) => {
 
 const getUserForms = async (req, res) => {
   try {
-    const forms = await FormSchema.find({ createdBy: req.user._id })
-      .select("-questions") // Exclude the questions field
-      .lean(); // Convert documents to plain JS objects
+    const forms = await FormSchema.aggregate([
+      { $match: { createdBy: req.user._id } },
+      {
+        $addFields: {
+          questionCount: { $size: "$questions" }, // Calculate question count
+        },
+      },
+      {
+        $unset: "questions", // Remove the 'questions' field
+      },
+    ]);
 
     // Fetch submission counts for each form
     const formIds = forms.map((form) => form._id);

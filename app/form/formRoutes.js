@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.get("/", authenticateUserMiddleware, getUserForms);
 router.post("/", authenticateUserMiddleware, createForm);
-router.get("/:id", authenticateUserMiddleware, getForm);
+router.get("/:id", getForm);
 router.patch("/:id", authenticateUserMiddleware, updateForm);
 router.delete("/:id", authenticateUserMiddleware, deleteForm);
 

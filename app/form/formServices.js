@@ -86,13 +86,19 @@ const getUserForms = async (req, res) => {
 };
 
 const getForm = async (req, res) => {
-  const { id: formId } = req.params;
+  try {
+    const { id: formId } = req.params;
+    const form = await FormSchema.findById(formId).populate(
+      "createdBy",
+      "name"
+    );
 
-  const form = await FormSchema.findById(formId).populate("createdBy", "name");
+    if (!form) return createError(res, "Form not found", 404);
 
-  if (!form) return createError(res, "Form not found", 404);
-
-  createResponse(res, form, 200);
+    createResponse(res, form, 200);
+  } catch (err) {
+    createError(res, `Error getting form: ${err?.message | ""}`, err);
+  }
 };
 
 const updateForm = async (req, res) => {
